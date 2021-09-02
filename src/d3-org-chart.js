@@ -2,9 +2,10 @@ import { selection, select } from "d3-selection";
 import { max, min, sum, cumsum } from "d3-array";
 import { tree, stratify } from "d3-hierarchy";
 import { zoom, zoomIdentity } from "d3-zoom";
-import { flextree } from 'd3-flextree';
-import { linkHorizontal } from 'd3-shape';
-import { group, rollup } from 'd3-array'
+import { flextree } from "d3-flextree";
+import { linkHorizontal } from "d3-shape";
+import { group, rollup } from "d3-array";
+import { drag } from "d3-drag";
 
 const d3 = {
     selection,
@@ -19,11 +20,12 @@ const d3 = {
     zoomIdentity,
     linkHorizontal,
     group,
-    rollup
+    rollup,
+    drag
 }
 export class OrgChart {
     constructor() {
-        // Exposed variables 
+        // Exposed variables
         const attrs = {
             id: `ID${Math.floor(Math.random() * 1000000)}`, // Id for event handlings
             firstDraw: true,
@@ -95,9 +97,10 @@ export class OrgChart {
             compactMarginPair: d => 100,
             compactMarginBetween: (d3Node => 20),
             onNodeClick: (d) => d,
+            onNodeDrag: (d3Node) => d3Node,
             linkGroupArc: d3.linkHorizontal().x(d => d.x).y(d => d.y),
             // ({ source, target }) => {
-            //     return 
+            //     return
             //     return `M ${source.x} , ${source.y} Q ${(source.x + target.x) / 2 + 100},${source.y-100}  ${target.x}, ${target.y}`;
             // },
             nodeContent: d => `<div style="padding:5px;font-size:10px;">Sample Node(id=${d.id}), override using <br/> <br/> 
@@ -1034,10 +1037,10 @@ export class OrgChart {
                   L ${x} ${y}
                   L ${x} ${y + h * yrvs}
                   C  ${x} ${y + h * yrvs + r * yrvs} ${x} ${y + h * yrvs + r * yrvs
-            } ${x + r * xrvs} ${y + h * yrvs + r * yrvs}
+        } ${x + r * xrvs} ${y + h * yrvs + r * yrvs}
                   L ${x + w * xrvs + r * xrvs} ${y + h * yrvs + r * yrvs}
                   C  ${ex}  ${y + h * yrvs + r * yrvs} ${ex}  ${y + h * yrvs + r * yrvs
-            } ${ex} ${ey - h * yrvs}
+        } ${ex} ${ey - h * yrvs}
                   L ${ex} ${ey}
        `;
         return path;

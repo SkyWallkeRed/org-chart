@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="build/d3-org-chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-flextree@2.0.0/build/d3-flextree.js"></script>
+<div
+        class="chart-container"
+></div>
+
+<script>
+  var chart;
+  d3.csv(
+          'https://raw.githubusercontent.com/bumbeishvili/sample-data/main/org.csv'
+  ).then(data => {
+    chart = new d3.OrgChart()
+            .container('.chart-container')
+            .data(data)
+            .render();
+  });
+</script>
+</body>
+</html>
