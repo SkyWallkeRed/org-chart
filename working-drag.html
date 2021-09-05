@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="build/d3-org-chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-flextree@2.0.0/build/d3-flextree.js"></script>
+<div class="chart-container"></div>
+<button>Add Rect</button>
+<div class="svg-container">
+  <svg id="click" xmlns="http://www.w3.org/2000/svg" width="600" height="300">
+    <defs>
+      <g id="pointer" transform="scale(0.8)">
+        <path d="M0-1c-14.5-25.6-14.5-25.7-14.5-33.8c0-8.1,6.5-14.6,14.5-14.6s14.5,6.6,14.5,14.6C14.5-26.7,14.5-26.6,0-1z"></path>
+        <path d="M0-49c7.7,0,14,6.3,14,14.1c0,8,0,8.1-14,32.8c-14-24.7-14-24.9-14-32.8C-14-42.7-7.7-49,0-49 M0-50c-8.3,0-15,6.8-15,15.1 S-15-26.5,0,0c15-26.5,15-26.5,15-34.9S8.3-50,0-50L0-50z"></path>
+      </g>
+    </defs>
+  </svg>
+</div>
+<script>
+  // const handler = d3.drag();
+  let chart;
+  var svg = d3.select("body")
+          .append("svg")
+          .attr("width", 500)
+          .attr("height", 300);
+
+  d3.select("button")
+          .on("click", function() {
+
+            svg.append("rect")
+                    .attr("width",500)
+                    .attr("height", 500)
+                    .attr("x", 150)
+                    .attr("y", 100)
+                    .attr("fill","#1b1c3b")
+                    .attr("opacity", ".5")
+                    .attr("stroke", "black")
+                    .attr("stroke-width", "2")
+                    .attr("cursor", "move")
+                    .call(d3.drag()
+                            .on('start', dragStart)
+                            .on('drag', dragging)
+                            .on('end', dragEnd)
+                    );
+
+            svg.append("use")
+                    .attr("href", "#pointer")
+                    .attr("x", 50)
+                    .attr("y", 50)
+                    // .attr("width", 50)
+                    // .attr("height", 50)
+                    .attr("fill", "#039BE5")
+                    .attr("stroke", "#039BE5")
+                    .attr("stroke-width", "1px")
+                    .call(d3.drag()
+                            .on('start', dragStart)
+                            .on('drag', dragging)
+                            .on('end', dragEnd)
+                    );
+
+            function dragStart(event,d){
+              d3.select(this)
+                      .style("stroke", "")
+            }
+
+            function dragging(event,d){
+              var xCoor = event.x;
+              var yCoor = event.y;
+
+              d3.select(this)
+                      .attr("x", xCoor)
+                      .attr("y", yCoor);
+            }
+
+            function dragEnd(event,d){
+              d3.select(this)
+                      .style("stroke", "black")
+            }
+
+          })
+
+</script>
+</body>
+</html>

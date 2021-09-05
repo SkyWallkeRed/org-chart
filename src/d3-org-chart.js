@@ -1,4 +1,4 @@
-import { selection, select } from "d3-selection";
+import { selection, select, selectAll } from "d3-selection";
 import { max, min, sum, cumsum } from "d3-array";
 import { tree, stratify } from "d3-hierarchy";
 import { zoom, zoomIdentity } from "d3-zoom";
@@ -10,6 +10,7 @@ import { drag } from "d3-drag";
 const d3 = {
     selection,
     select,
+    selectAll,
     max,
     min,
     sum,
@@ -88,7 +89,7 @@ export class OrgChart {
                     .attr("stroke", d => d.data._highlighted || d.data._upToTheRootHighlighted ? '#152785' : 'none')
                     .attr("stroke-width", d.data._highlighted || d.data._upToTheRootHighlighted ? 10 : 1)
             },
-
+            onNodeDrag: (d) => d,
             nodeWidth: d3Node => 250,
             nodeHeight: d => 150,
             siblingsMargin: d3Node => 20,
@@ -97,7 +98,6 @@ export class OrgChart {
             compactMarginPair: d => 100,
             compactMarginBetween: (d3Node => 20),
             onNodeClick: (d) => d,
-            onNodeDrag: (d3Node) => d3Node,
             linkGroupArc: d3.linkHorizontal().x(d => d.x).y(d => d.y),
             // ({ source, target }) => {
             //     return
@@ -784,6 +784,7 @@ export class OrgChart {
             .enter()
             .append("g")
             .attr("class", "node")
+            .attr("class", "node")
             .attr("transform", (d) => {
                 if (d == attrs.root) return `translate(${x0},${y0})`
                 const xj = attrs.layoutBindings[attrs.layout].nodeJoinX({ x: x0, y: y0, width, height });
@@ -796,7 +797,60 @@ export class OrgChart {
                     return;
                 }
                 attrs.onNodeClick(attrs.nodeId(data));
-            });
+            }).call(d3.drag()
+                .on('start', dragStart)
+                .on('drag', dragging)
+                .on('end', dragEnd)
+            );
+
+
+        function dragStart(event, d) {
+            if (d == attrs.root) return;
+            console.log('start', event, d);
+            // d3.select(this)
+            //     .attr("stroke", d => '#152785')
+        }
+
+        function dragging(event, d) {
+            if (d == attrs.root) return;
+            d3.select(this)
+                .attr("transform", (d) => {
+                    const yj = attrs.layoutBindings[attrs.layout].nodeJoinY({x: event.x, y: event.y, width, height});
+                    const xj = attrs.layoutBindings[attrs.layout].nodeJoinX({x: event.x, y: event.y, width, height});
+                    return `translate(${xj},${yj})`
+                })
+        }
+
+        function dragEnd(event, d) {
+            if (d == attrs.root) return;
+            const all = d3.selectAll('.node')
+            const locations = Array.from(all._groups[0]).map(node => {
+                // const reges = new RegExp('#(?<=\\()[^)]*(?=\\))#');
+                // console.log('node.attributes.transform.value', node.attributes.transform.value);
+                // const pos = reges.exec(node.attributes.transform.value);
+                // const pos = node.attributes.transform.value.replace(
+                //      /(?<=\()[^)]*(?=\))/,
+                //      (match) => match)
+                //  console.log(pos);
+                return {
+                    id: node.__data__.id,
+                    pos: node.attributes.transform.value
+                }
+            })
+            const yj = attrs.layoutBindings[attrs.layout].nodeJoinY({x: event.x, y: event.y, width, height});
+            const xj = attrs.layoutBindings[attrs.layout].nodeJoinX({x: event.x, y: event.y, width, height});
+            console.log(yj,xj);
+            console.log(locations);
+
+            // console.log(event);
+            // d3.select(this)
+            //     .attr("transform", (d) => {
+            //         const xj = attrs.layoutBindings[attrs.layout].nodeJoinX({x: x, y: y, width, height});
+            //         const yj = attrs.layoutBindings[attrs.layout].nodeJoinY({x: x, y: y, width, height});
+            //         return `translate(${xj},${yj})`
+            //     });
+        }
+
 
         // Add background rectangle for the nodes
         nodeEnter
